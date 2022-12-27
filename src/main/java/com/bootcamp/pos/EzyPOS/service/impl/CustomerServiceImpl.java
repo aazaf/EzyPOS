@@ -3,15 +3,16 @@ package com.bootcamp.pos.EzyPOS.service.impl;
 import com.bootcamp.pos.EzyPOS.dto.CustomerDTO;
 import com.bootcamp.pos.EzyPOS.dto.request.CustomerRequestDTO;
 import com.bootcamp.pos.EzyPOS.dto.response.CustomerResponseDTO;
+import com.bootcamp.pos.EzyPOS.dto.response.paginate.PaginateCustomerResponseDTO;
 import com.bootcamp.pos.EzyPOS.entity.Customer;
 import com.bootcamp.pos.EzyPOS.repo.CustomerRepo;
 import com.bootcamp.pos.EzyPOS.service.CustomerService;
 import com.bootcamp.pos.EzyPOS.util.IdGenerator;
 import com.bootcamp.pos.EzyPOS.util.mapper.CustomerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Optional;
 
 /**
@@ -68,16 +69,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerResponseDTO> findAllCustomers() {
-        return customerMapper.toCustomerResponseDTOList(customerRepo.findAll());
+    public PaginateCustomerResponseDTO findAllCustomers(
+            String searchText, int page, int size
+    ) {
 
-//        List<CustomerResponseDTO> dtos = new ArrayList<>();
-//        List<Customer> list = customerRepo.findAll();
-//        for (Customer c : list
-//        ) {
-//            dtos.add(new CustomerResponseDTO(c.getId(), c.getName(), c.getAddress(), c.getSalary()));
-//        }
-//        return dtos;
-//    }
+        return new PaginateCustomerResponseDTO(
+                customerRepo.countCustomer(searchText),
+                customerMapper.toCustomerResponseDTOList(
+                        customerRepo.searchCustomer(searchText, PageRequest.of(page, size)))
+        );
     }
 }
